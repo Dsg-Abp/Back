@@ -110,7 +110,7 @@ class AuthController {
           }
         );
 
-        res.status(200).json({ token, user: userWithoutPassword });
+        res.status(200).json({ token });
       } else {
         res.status(401).json({ error: "Credenciais inválidas" });
       }
