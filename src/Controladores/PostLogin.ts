@@ -8,6 +8,7 @@ import {
   Strategy as GoogleStrategy,
   VerifyCallback,
 } from "passport-google-oauth20";
+import pool from "./db";
 
 dotenv.config();
 
@@ -18,15 +19,14 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL!;
 const FRONTEND_URL = process.env.REACT_APP_FRONTEND_URL!;
 
-import pool from "./db";
-
-// Interface personalizada que estende Express.User
 interface User extends Express.User {
   _id?: ObjectId;
   googleId?: string;
   email: string;
   nome: string;
   senha?: string;
+  accessToken?: string;
+  refreshToken?: string;
 }
 
 class AuthController {
@@ -49,20 +49,21 @@ class AuthController {
             const db = client.db(DB_NAME);
             const collection = db.collection<User>("login");
 
-            // Verifica se o usuário já existe no banco de dados
-            let user = await collection.findOne({ googleId: profile.id });
+            const updateData = {
+              googleId: profile.id,
+              email: profile.emails?.[0].value,
+              nome: profile.displayName,
+              accessToken,
+              refreshToken,
+            };
 
-            if (!user) {
-              // Se o usuário não existir, cria um novo usuário
-              const newUser: Omit<User, "_id"> = {
-                googleId: profile.id,
-                email: profile.emails?.[0].value,
-                nome: profile.displayName,
-              };
+            const result = await collection.updateOne(
+              { googleId: profile.id },
+              { $set: updateData },
+              { upsert: true }
+            );
 
-              const result = await collection.insertOne(newUser);
-              user = await collection.findOne({ _id: result.insertedId });
-            }
+            const user = await collection.findOne({ googleId: profile.id });
 
             done(null, user || undefined);
           } catch (error) {
@@ -121,7 +122,16 @@ class AuthController {
   }
 
   googleLogin(req: Request, res: Response) {
-    passport.authenticate("google", { scope: ["profile", "email"] })(req, res);
+    passport.authenticate("google", {
+      scope: [
+        "profile",
+        "email",
+        "https://www.googleapis.com/auth/fitness.heart_rate.read",
+        "https://www.googleapis.com/auth/fitness.activity.read",
+        "https://www.googleapis.com/auth/fitness.activity.write",
+        // Adicione outros escopos que você precisar
+      ],
+    })(req, res);
   }
 
   googleCallback(req: Request, res: Response) {
