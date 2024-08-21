@@ -37,7 +37,7 @@ router.get("/auth/google/callback", (req, res) =>
 );
 
 // Rota para obter dados de batimentos cardíacos, passos e atividades físicas
-router.get("/user/:userId/health-data", (req, res) =>
+router.get("/user/:userId/health-data", authenticateToken, (req, res) =>
   healthController.getHealthData(req, res)
 );
 
