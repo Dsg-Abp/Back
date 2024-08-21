@@ -20,13 +20,14 @@ const FRONTEND_URL = process.env.REACT_APP_FRONTEND_URL!;
 
 import pool from "./db";
 
-// Interface personalizada que estende Express.User
 interface User extends Express.User {
   _id?: ObjectId;
   googleId?: string;
   email: string;
   nome: string;
   senha?: string;
+  accessToken?: string;
+  refreshToken?: string;
 }
 
 class AuthController {
@@ -49,19 +50,24 @@ class AuthController {
             const db = client.db(DB_NAME);
             const collection = db.collection<User>("login");
 
-            // Verifica se o usuário já existe no banco de dados
             let user = await collection.findOne({ googleId: profile.id });
 
             if (!user) {
-              // Se o usuário não existir, cria um novo usuário
               const newUser: Omit<User, "_id"> = {
                 googleId: profile.id,
                 email: profile.emails?.[0].value,
                 nome: profile.displayName,
+                accessToken,
+                refreshToken,
               };
 
               const result = await collection.insertOne(newUser);
               user = await collection.findOne({ _id: result.insertedId });
+            } else {
+              await collection.updateOne(
+                { _id: user._id },
+                { $set: { accessToken, refreshToken } }
+              );
             }
 
             done(null, user || undefined);
@@ -136,7 +142,6 @@ class AuthController {
           expiresIn: "1h",
         });
 
-        // Redireciona para o frontend com o token na URL
         res.redirect(`${FRONTEND_URL}/?token=${token}`);
       }
     )(req, res);
