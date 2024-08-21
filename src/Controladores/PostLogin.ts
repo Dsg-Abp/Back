@@ -50,7 +50,6 @@ class AuthController {
             const db = client.db(DB_NAME);
             const collection = db.collection<User>("login");
 
-            // Verifica se o usuário já existe no banco de dados
             let user = await collection.findOne({ googleId: profile.id });
 
             if (!user) {
