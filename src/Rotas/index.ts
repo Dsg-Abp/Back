@@ -12,7 +12,7 @@ const authController = new AuthController();
 const cadastro = new Cadastro();
 const redefinicaoSenha = new RedefinicaoSenha();
 const emailController = new EmailController();
-const healthController = new HealthController(); // Instanciando o HealthController
+const healthController = new HealthController();
 
 // Rota de login
 router.post("/login", authController.login);
@@ -37,7 +37,7 @@ router.get("/auth/google/callback", (req, res) =>
 );
 
 // Rota para obter dados de batimentos cardíacos, passos e atividades físicas
-router.get("/user/:userId/health-data", authenticateToken, (req, res) =>
+router.get("/user/:userId/health-data", (req, res) =>
   healthController.getHealthData(req, res)
 );
 

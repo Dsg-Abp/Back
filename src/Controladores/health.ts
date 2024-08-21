@@ -9,6 +9,15 @@ dotenv.config();
 const DB_NAME = process.env.DB_NAME!;
 const GOOGLE_FIT_API_URL = "https://fitness.googleapis.com/fitness/v1/users/me";
 
+interface DataSource {
+  dataSourceId: string;
+  dataType: { name: string };
+}
+
+interface Dataset {
+  datasetId: string;
+}
+
 interface User {
   _id?: ObjectId;
   googleId?: string;
@@ -20,7 +29,7 @@ interface User {
 class HealthController {
   async getHealthData(req: Request, res: Response) {
     const userId = req.params.userId;
-    console.log("User ID:", userId); // Verifica o ID do usuário
+    console.log("User ID:", userId);
 
     if (!ObjectId.isValid(userId)) {
       return res.status(400).json({ error: "ID do usuário inválido" });
@@ -32,7 +41,7 @@ class HealthController {
       const collection = db.collection<User>("login");
 
       const user = await collection.findOne({ _id: new ObjectId(userId) });
-      console.log("User encontrado:", user); // Verifica se o usuário foi encontrado
+      console.log("User encontrado:", user);
 
       if (!user || !user.accessToken) {
         return res
@@ -41,7 +50,7 @@ class HealthController {
       }
 
       const accessToken = user.accessToken;
-      console.log("Access Token:", accessToken); // Verifica o token de acesso
+      console.log("Access Token:", accessToken);
 
       const dataSourcesResponse = await axios.get(
         `${GOOGLE_FIT_API_URL}/dataSources`,
@@ -51,14 +60,15 @@ class HealthController {
           },
         }
       );
-      console.log("Data Sources Response:", dataSourcesResponse.data); // Verifica a resposta da API
+      console.log("Data Sources Response:", dataSourcesResponse.data);
 
-      const dataSources = dataSourcesResponse.data.dataSource || [];
+      const dataSources: DataSource[] =
+        dataSourcesResponse.data.dataSource || [];
 
       const responses = await Promise.all(
-        dataSources.map(async (source: any) => {
+        dataSources.map(async (source) => {
           const dataSourceId = source.dataSourceId;
-          console.log("Data Source ID:", dataSourceId); // Verifica o ID do Data Source
+          console.log("Data Source ID:", dataSourceId);
 
           const datasetsResponse = await axios.get(
             `${GOOGLE_FIT_API_URL}/dataSources/${dataSourceId}/datasets`,
@@ -68,14 +78,14 @@ class HealthController {
               },
             }
           );
-          console.log("Datasets Response:", datasetsResponse.data); // Verifica a resposta dos datasets
+          console.log("Datasets Response:", datasetsResponse.data);
 
-          const datasets = datasetsResponse.data.dataset || [];
+          const datasets: Dataset[] = datasetsResponse.data.dataset || [];
           if (!datasets.length) return null;
 
-          const datasetPromises = datasets.map(async (dataset: any) => {
+          const datasetPromises = datasets.map(async (dataset) => {
             const datasetId = dataset.datasetId;
-            console.log("Dataset ID:", datasetId); // Verifica o ID do Dataset
+            console.log("Dataset ID:", datasetId);
 
             try {
               const dataResponse = await axios.post(
@@ -93,7 +103,7 @@ class HealthController {
                   },
                 }
               );
-              console.log("Data Response:", dataResponse.data); // Verifica a resposta dos dados
+              console.log("Data Response:", dataResponse.data);
 
               return { dataSourceId, data: dataResponse.data };
             } catch (error) {
