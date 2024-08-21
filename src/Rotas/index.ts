@@ -12,7 +12,7 @@ const authController = new AuthController();
 const cadastro = new Cadastro();
 const redefinicaoSenha = new RedefinicaoSenha();
 const emailController = new EmailController();
-const healthController = new HealthController();
+const healthController = new HealthController(); // Instanciando o HealthController
 
 // Rota de login
 router.post("/login", authController.login);

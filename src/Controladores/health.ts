@@ -52,6 +52,7 @@ class HealthController {
       const accessToken = user.accessToken;
       console.log("Access Token:", accessToken);
 
+      // Obter fontes de dados do Google Fit
       const dataSourcesResponse = await axios.get(
         `${GOOGLE_FIT_API_URL}/dataSources`,
         {
@@ -64,59 +65,96 @@ class HealthController {
 
       const dataSources: DataSource[] =
         dataSourcesResponse.data.dataSource || [];
+      console.log("Data Sources:", dataSources);
 
+      // Filtrar fluxos de dados relevantes
+      const relevantDataSources = dataSources.filter((source) =>
+        [
+          "com.google.heart_rate.bpm",
+          "com.google.step_count.cumulative",
+          "com.google.activity.segment",
+          "com.google.weight",
+          "com.google.height",
+          "com.google.calories.expended",
+        ].includes(source.dataType.name)
+      );
+      console.log("Relevant Data Sources:", relevantDataSources);
+
+      // Obter dados dos fluxos de dados relevantes
       const responses = await Promise.all(
-        dataSources.map(async (source) => {
+        relevantDataSources.map(async (source) => {
           const dataSourceId = source.dataSourceId;
           console.log("Data Source ID:", dataSourceId);
 
-          const datasetsResponse = await axios.get(
-            `${GOOGLE_FIT_API_URL}/dataSources/${dataSourceId}/datasets`,
-            {
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-              },
-            }
-          );
-          console.log("Datasets Response:", datasetsResponse.data);
+          if (!dataSourceId) {
+            console.warn("Data Source ID está ausente.");
+            return null;
+          }
 
-          const datasets: Dataset[] = datasetsResponse.data.dataset || [];
-          if (!datasets.length) return null;
-
-          const datasetPromises = datasets.map(async (dataset) => {
-            const datasetId = dataset.datasetId;
-            console.log("Dataset ID:", datasetId);
-
-            try {
-              const dataResponse = await axios.post(
-                `${GOOGLE_FIT_API_URL}/dataSources/${dataSourceId}/datasets/${datasetId}:aggregate`,
-                {
-                  aggregateBy: [{ dataTypeName: source.dataType.name }],
-                  bucketByTime: { durationMillis: 60000 },
-                  startTimeMillis: Date.now() - 24 * 60 * 60 * 1000,
-                  endTimeMillis: Date.now(),
+          try {
+            // Obter datasets para o dataSourceId
+            const datasetsResponse = await axios.get(
+              `${GOOGLE_FIT_API_URL}/dataSources/${dataSourceId}/datasets`,
+              {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
                 },
-                {
-                  headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                    "Content-Type": "application/json",
+              }
+            );
+            console.log("Datasets Response:", datasetsResponse.data);
+
+            const datasets: Dataset[] = datasetsResponse.data.dataset || [];
+            console.log("Datasets:", datasets);
+
+            if (!datasets.length) return null;
+
+            // Obter dados agregados para cada dataset
+            const datasetPromises = datasets.map(async (dataset) => {
+              const datasetId = dataset.datasetId;
+              console.log("Dataset ID:", datasetId);
+
+              if (!datasetId) {
+                console.warn("Dataset ID está ausente.");
+                return null;
+              }
+
+              try {
+                const dataResponse = await axios.post(
+                  `${GOOGLE_FIT_API_URL}/dataSources/${dataSourceId}/datasets/${datasetId}:aggregate`,
+                  {
+                    aggregateBy: [{ dataTypeName: source.dataType.name }],
+                    bucketByTime: { durationMillis: 60000 }, // 1 minuto
+                    startTimeMillis: Date.now() - 24 * 60 * 60 * 1000, // Últimos 24 horas
+                    endTimeMillis: Date.now(),
                   },
-                }
-              );
-              console.log("Data Response:", dataResponse.data);
+                  {
+                    headers: {
+                      Authorization: `Bearer ${accessToken}`,
+                      "Content-Type": "application/json",
+                    },
+                  }
+                );
+                console.log("Data Response:", dataResponse.data);
 
-              return { dataSourceId, data: dataResponse.data };
-            } catch (error) {
-              console.error(
-                `Erro ao obter dados para o datasetId ${datasetId} no dataSourceId ${dataSourceId}:`,
-                error
-              );
-              return null;
-            }
-          });
+                return { dataSourceId, data: dataResponse.data };
+              } catch (error) {
+                console.error(
+                  `Erro ao obter dados para o datasetId ${datasetId} no dataSourceId ${dataSourceId}:`,
+                  error
+                );
+                return null;
+              }
+            });
 
-          const dataResults = await Promise.all(datasetPromises);
-          return dataResults.filter((result) => result !== null);
+            const dataResults = await Promise.all(datasetPromises);
+            return dataResults.filter((result) => result !== null);
+          } catch (error) {
+            console.error(
+              `Erro ao obter datasets para o dataSourceId ${dataSourceId}:`,
+              error
+            );
+            return null;
+          }
         })
       );
 
