@@ -127,7 +127,16 @@ class AuthController {
   }
 
   googleLogin(req: Request, res: Response) {
-    passport.authenticate("google", { scope: ["profile", "email"] })(req, res);
+    passport.authenticate("google", {
+      scope: [
+        "profile",
+        "email",
+        "https://www.googleapis.com/auth/fitness.activity.read",
+        "https://www.googleapis.com/auth/fitness.activity.write",
+        "https://www.googleapis.com/auth/fitness.body.read",
+        "https://www.googleapis.com/auth/fitness.body.write",
+      ],
+    })(req, res);
   }
 
   googleCallback(req: Request, res: Response) {
