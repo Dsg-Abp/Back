@@ -107,7 +107,6 @@ class AuthController {
           }
         );
 
-        // Enviar o token e o userId na resposta
         res
           .status(200)
           .json({ token, userId: userWithoutPassword._id!.toString() });
