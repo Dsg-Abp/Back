@@ -4,10 +4,13 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import passport from "passport";
+import pool from "./db";
 import {
   Strategy as GoogleStrategy,
   VerifyCallback,
 } from "passport-google-oauth20";
+
+import { User } from "../types/custom";
 
 dotenv.config();
 
@@ -17,18 +20,6 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL!;
 const FRONTEND_URL = process.env.REACT_APP_FRONTEND_URL!;
-
-import pool from "./db";
-
-interface User extends Express.User {
-  _id?: ObjectId;
-  googleId?: string;
-  email: string;
-  nome: string;
-  senha?: string;
-  accessToken?: string;
-  refreshToken?: string;
-}
 
 class AuthController {
   constructor() {
