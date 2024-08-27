@@ -4,6 +4,7 @@ import Cadastro from "../Controladores/Cadastro";
 import RedefinicaoSenha from "../Controladores/RecuperaçãoSenha";
 import EmailController from "../Controladores/PostResetSenha";
 import { authenticateToken } from "../Controladores/authMiddleware";
+import HealthPass from "../Controladores/healthPass";
 
 const router = express.Router();
 
@@ -11,6 +12,7 @@ const authController = new AuthController();
 const cadastro = new Cadastro();
 const redefinicaoSenha = new RedefinicaoSenha();
 const emailController = new EmailController();
+const healthPass = new HealthPass();
 
 // Rota de login
 router.post("/login", authController.login);
@@ -34,7 +36,9 @@ router.get("/auth/google/callback", (req, res) =>
   authController.googleCallback(req, res)
 );
 
-// Exemplo de rota protegida com autenticação JWT
-//router.post("/login", authenticateToken, authController.login);
+// Rota para obter contagem de passos
+router.get("/user/:userId/step-count", (req, res) =>
+  healthPass.getStepCount(req, res)
+);
 
 export default router;
