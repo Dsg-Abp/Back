@@ -107,7 +107,10 @@ class AuthController {
           }
         );
 
-        res.status(200).json({ token });
+        // Enviar o token e o userId na resposta
+        res
+          .status(200)
+          .json({ token, userId: userWithoutPassword._id!.toString() });
       } else {
         res.status(401).json({ error: "Credenciais inválidas" });
       }
@@ -142,7 +145,9 @@ class AuthController {
           expiresIn: "1h",
         });
 
-        res.redirect(`${FRONTEND_URL}/?token=${token}`);
+        res.redirect(
+          `${FRONTEND_URL}/?token=${token}&userId=${user._id!.toString()}`
+        );
       }
     )(req, res);
   }
