@@ -4,6 +4,7 @@ import Cadastro from "../Controladores/Cadastro";
 import RedefinicaoSenha from "../Controladores/RecuperaçãoSenha";
 import EmailController from "../Controladores/PostResetSenha";
 import { authenticateToken } from "../Controladores/authMiddleware";
+import Alimentos from "../Controladores/AlimentosController";
 
 const router = express.Router();
 
@@ -11,6 +12,10 @@ const authController = new AuthController();
 const cadastro = new Cadastro();
 const redefinicaoSenha = new RedefinicaoSenha();
 const emailController = new EmailController();
+const alimentosController = new Alimentos(); //rota adicionada para procurar dados no banco;
+
+// Definindo a rota para buscar alimentos
+router.post('/buscar-alimento', alimentosController.Find);
 
 // Rota de login
 router.post("/login", authController.login);
