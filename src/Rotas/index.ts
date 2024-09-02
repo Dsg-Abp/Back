@@ -37,4 +37,6 @@ router.get("/auth/google/callback", (req, res) =>
 // Exemplo de rota protegida com autenticação JWT
 //router.post("/login", authenticateToken, authController.login);
 
+
+
 export default router;
