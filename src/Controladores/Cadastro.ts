@@ -51,7 +51,6 @@ class Cadastro {
 
   async register(req: Request, res: Response) {
     const { email, senha, nome } = req.body;
-    let agua = 0
 
     if (!email || !senha || !nome) {
       return res
@@ -86,7 +85,6 @@ class Cadastro {
         nome,
         recoveryCode,
         createdAt: new Date(),
-        agua
       };
 
       // Insere o novo usuário na coleção
