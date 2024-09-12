@@ -5,15 +5,25 @@ import RedefinicaoSenha from "../Controladores/RecuperaçãoSenha";
 import EmailController from "../Controladores/PostResetSenha";
 import { authenticateToken } from "../Controladores/authMiddleware";
 
+import Agua from "../Controladores/UpWater";
+
 const router = express.Router();
 
 const authController = new AuthController();
 const cadastro = new Cadastro();
+
+//parte da agua
+const agua = new Agua();
+
+
 const redefinicaoSenha = new RedefinicaoSenha();
 const emailController = new EmailController();
 
 // Rota de login
 router.post("/login", authController.login);
+
+//rota de insercao de agua
+router.post("/agua", agua.registera);
 
 // Rota de cadastro de usuário (registro)
 router.post("/register", cadastro.register);
