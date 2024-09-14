@@ -14,13 +14,17 @@ class Alimentos {
             res.status(400).json({ message: 'Descrição do alimento é obrigatória' });
             return;
         }
+
         let client: MongoClient | null = null;
         try {
             client = await pool.connect(); // Conectar ao banco de dados
             const db = client.db(DB_NAME);
             const collection = db.collection("alimentos");
-            const alimentos = await collection.find({ "Descrição do Alimento": new RegExp(descricao, "i") })
-                .toArray();
+
+            // Corrigir a busca para refletir a estrutura dos dados
+            const alimentos = await collection.find({
+                "Descrição do Alimento": new RegExp(descricao, "i")
+            }).toArray();
 
             // Retornar os resultados
             res.status(200).json(alimentos);
