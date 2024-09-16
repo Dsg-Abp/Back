@@ -4,11 +4,8 @@ import Cadastro from "../Controladores/Cadastro";
 import RedefinicaoSenha from "../Controladores/RecuperaçãoSenha";
 import EmailController from "../Controladores/PostResetSenha";
 import { authenticateToken } from "../Controladores/authMiddleware";
-<<<<<<< HEAD
 import Alimentos from "../Controladores/AlimentosController";
-=======
 import HealthPass from "../Controladores/healthPass";
->>>>>>> bd7db07353e8b2f82b9e8f6a665e0c0b74fc8157
 
 const router = express.Router();
 
@@ -16,14 +13,11 @@ const authController = new AuthController();
 const cadastro = new Cadastro();
 const redefinicaoSenha = new RedefinicaoSenha();
 const emailController = new EmailController();
-<<<<<<< HEAD
 const alimentosController = new Alimentos(); //rota adicionada para procurar dados no banco;
 
 // Definindo a rota para buscar alimentos
 router.post('/buscar-alimento', alimentosController.Find);
-=======
 const healthPass = new HealthPass();
->>>>>>> bd7db07353e8b2f82b9e8f6a665e0c0b74fc8157
 
 // Rota de login
 router.post("/login", authController.login);
