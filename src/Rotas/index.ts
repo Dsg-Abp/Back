@@ -4,6 +4,7 @@ import Cadastro from "../Controladores/Cadastro";
 import RedefinicaoSenha from "../Controladores/RecuperaçãoSenha";
 import EmailController from "../Controladores/PostResetSenha";
 import { authenticateToken } from "../Controladores/authMiddleware";
+import Alimentos from "../Controladores/AlimentosController";
 import HealthPass from "../Controladores/healthPass";
 import GetHealthPass from "../Controladores/getHealthPass";
 
@@ -13,6 +14,10 @@ const authController = new AuthController();
 const cadastro = new Cadastro();
 const redefinicaoSenha = new RedefinicaoSenha();
 const emailController = new EmailController();
+const alimentosController = new Alimentos(); //rota adicionada para procurar dados no banco;
+
+// Definindo a rota para buscar alimentos
+router.post('/buscar-alimento', alimentosController.Find);
 const healthPass = new HealthPass();
 const getHealthPass = new GetHealthPass();
 
