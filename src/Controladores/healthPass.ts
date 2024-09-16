@@ -105,7 +105,7 @@ class HealthPass {
               dataTypeName: "com.google.step_count.delta",
             },
           ],
-          bucketByTime: { durationMillis: 60000 },
+          bucketByTime: { durationMillis: 600000 },
           startTimeMillis: instantStartTimeMillis,
           endTimeMillis: instantEndTimeMillis,
         },
