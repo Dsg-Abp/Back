@@ -4,10 +4,13 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import passport from "passport";
+import pool from "./db";
 import {
   Strategy as GoogleStrategy,
   VerifyCallback,
 } from "passport-google-oauth20";
+
+import { User } from "../types/custom";
 
 dotenv.config();
 
@@ -17,17 +20,6 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL!;
 const FRONTEND_URL = process.env.REACT_APP_FRONTEND_URL!;
-
-import pool from "./db";
-
-// Interface personalizada que estende Express.User
-interface User extends Express.User {
-  _id?: ObjectId;
-  googleId?: string;
-  email: string;
-  nome: string;
-  senha?: string;
-}
 
 class AuthController {
   constructor() {
@@ -49,19 +41,24 @@ class AuthController {
             const db = client.db(DB_NAME);
             const collection = db.collection<User>("login");
 
-            // Verifica se o usuário já existe no banco de dados
             let user = await collection.findOne({ googleId: profile.id });
 
             if (!user) {
-              // Se o usuário não existir, cria um novo usuário
               const newUser: Omit<User, "_id"> = {
                 googleId: profile.id,
                 email: profile.emails?.[0].value,
                 nome: profile.displayName,
+                accessToken,
+                refreshToken,
               };
 
               const result = await collection.insertOne(newUser);
               user = await collection.findOne({ _id: result.insertedId });
+            } else {
+              await collection.updateOne(
+                { _id: user._id },
+                { $set: { accessToken, refreshToken } }
+              );
             }
 
             done(null, user || undefined);
@@ -110,7 +107,9 @@ class AuthController {
           }
         );
 
-        res.status(200).json({ token });
+        res
+          .status(200)
+          .json({ token, userId: userWithoutPassword._id!.toString() });
       } else {
         res.status(401).json({ error: "Credenciais inválidas" });
       }
@@ -121,7 +120,16 @@ class AuthController {
   }
 
   googleLogin(req: Request, res: Response) {
-    passport.authenticate("google", { scope: ["profile", "email"] })(req, res);
+    passport.authenticate("google", {
+      scope: [
+        "profile",
+        "email",
+        "https://www.googleapis.com/auth/fitness.activity.read",
+        "https://www.googleapis.com/auth/fitness.activity.write",
+        "https://www.googleapis.com/auth/fitness.body.read",
+        "https://www.googleapis.com/auth/fitness.body.write",
+      ],
+    })(req, res);
   }
 
   googleCallback(req: Request, res: Response) {
@@ -136,8 +144,9 @@ class AuthController {
           expiresIn: "1h",
         });
 
-        // Redireciona para o frontend com o token na URL
-        res.redirect(`${FRONTEND_URL}/?token=${token}`);
+        res.redirect(
+          `${FRONTEND_URL}/?token=${token}&userId=${user._id!.toString()}`
+        );
       }
     )(req, res);
   }
