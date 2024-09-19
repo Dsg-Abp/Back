@@ -33,6 +33,7 @@ router.post("/login", authController.login);
 
 //rota de insercao de agua
 router.post("/agua", agua.registera);
+router.post("/listagua", agua.FindAgua);
 
 // Rota de cadastro de usuário (registro)
 router.post("/register", cadastro.register);
