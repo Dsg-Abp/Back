@@ -35,6 +35,7 @@ router.post("/login", authController.login);
 router.post("/agua", agua.registera);
 router.post("/listagua", agua.FindAgua);
 router.get("/teste", agua.findTeste);
+router.post("/insert", agua.upTest);
 
 // Rota de cadastro de usuário (registro)
 router.post("/register", cadastro.register);

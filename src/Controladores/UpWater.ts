@@ -101,6 +101,23 @@ class Agua {
     res.json({findResult})
     
   }
+
+  async upTest(req: Request, res:Response){
+    
+    let email = req.body
+
+    let client: MongoClient | null = null;
+    client = await pool.connect()
+    const db = client.db(DB_NAME_AGUA)
+    const collection = db.collection("IDagua")
+
+    const insertResult = await collection.insertOne({ email});
+    console.log('Inserted documents =>', insertResult);
+
+    res.json(insertResult)
+    
+
+  }
   
 }
 
