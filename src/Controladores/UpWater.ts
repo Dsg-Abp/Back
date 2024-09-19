@@ -88,6 +88,20 @@ class Agua {
     }
   }
   
+  async  findTeste(req: Request, res: Response) {
+    
+    let client: MongoClient | null = null;
+    client = await pool.connect(); // Conectar ao banco de dados
+      const db = client.db(DB_NAME_AGUA);
+      const collection = db.collection("IDagua");
+
+    const findResult = await collection.find({}).toArray();
+    console.log('Found documents =>', findResult);
+
+    res.json({findResult})
+    
+  }
+  
 }
 
 export default Agua;
