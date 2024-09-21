@@ -28,7 +28,7 @@ router.post("/login", authController.login);
 router.post("/register", cadastro.register);
 
 // Rota para salvar os dados do perfil
-router.post("/save-profile", newProfile.saveProfile);
+router.post("/profile", newProfile.saveProfile);
 
 // Rota de recuperação de senha
 router.post("/recuperacao-senha", redefinicaoSenha.resetPassword);
