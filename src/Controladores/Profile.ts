@@ -79,6 +79,37 @@ class Profile {
       }
     }
   }
+
+  async getProfile(req: Request, res: Response) {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({ error: "O userId é obrigatório" });
+    }
+
+    let client: MongoClient | null = null;
+
+    try {
+      client = await pool.connect();
+      const db = client.db(DB_NAME);
+      const collection = db.collection("profile");
+
+      const profile = await collection.findOne({ userId });
+
+      if (profile) {
+        res.status(200).json({ profile });
+      } else {
+        res.status(404).json({ message: "Perfil não encontrado" });
+      }
+    } catch (error) {
+      console.error("Erro ao obter perfil:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    } finally {
+      if (client) {
+        await client.close();
+      }
+    }
+  }
 }
 
 export default Profile;
