@@ -24,22 +24,42 @@ class Profile {
       const db = client.db(DB_NAME);
       const collection = db.collection("profile");
 
-      const newProfile = {
-        userId,
-        nome,
-        peso,
-        altura,
-        genero,
-        dataNascimento,
-        createdAt: new Date(),
-      };
+      const existingProfile = await collection.findOne({ userId });
 
-      const result = await collection.insertOne(newProfile);
+      if (existingProfile) {
+        const updatedProfile = {
+          nome,
+          peso,
+          altura,
+          genero,
+          dataNascimento,
+          updatedAt: new Date(),
+        };
 
-      res.status(201).json({
-        message: "Perfil salvo com sucesso",
-        profile: { ...newProfile, _id: result.insertedId },
-      });
+        await collection.updateOne({ userId }, { $set: updatedProfile });
+
+        res.status(200).json({
+          message: "Perfil atualizado com sucesso",
+          profile: { ...existingProfile, ...updatedProfile },
+        });
+      } else {
+        const newProfile = {
+          userId,
+          nome,
+          peso,
+          altura,
+          genero,
+          dataNascimento,
+          createdAt: new Date(),
+        };
+
+        const result = await collection.insertOne(newProfile);
+
+        res.status(201).json({
+          message: "Perfil salvo com sucesso",
+          profile: { ...newProfile, _id: result.insertedId },
+        });
+      }
     } catch (error) {
       console.error("Erro ao salvar perfil:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
