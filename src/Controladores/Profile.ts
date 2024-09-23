@@ -9,9 +9,18 @@ const DB_NAME = process.env.DB_NAME;
 
 class Profile {
   async saveProfile(req: Request, res: Response) {
-    const { nome, peso, altura, genero, dataNascimento, userId } = req.body;
+    const { nome, peso, altura, genero, dataNascimento, userId, imc } =
+      req.body;
 
-    if (!nome || !peso || !altura || !genero || !dataNascimento || !userId) {
+    if (
+      !nome ||
+      !peso ||
+      !altura ||
+      !genero ||
+      !dataNascimento ||
+      !userId ||
+      !imc
+    ) {
       return res
         .status(400)
         .json({ error: "Todos os campos são obrigatórios" });
@@ -28,6 +37,7 @@ class Profile {
 
       if (existingProfile) {
         const updatedProfile = {
+          imc,
           nome,
           peso,
           altura,
