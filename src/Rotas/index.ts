@@ -46,4 +46,7 @@ router.get("/auth/google/callback", (req, res) =>
   authController.googleCallback(req, res)
 );
 
+// Rota para obter os dados do perfil usando o userId
+router.get("/profile/:userId", newProfile.getProfile);
+
 export default router;
