@@ -54,6 +54,7 @@ class Profile {
         });
       } else {
         const newProfile = {
+          imc,
           userId,
           nome,
           peso,
