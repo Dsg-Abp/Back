@@ -7,6 +7,7 @@ import { authenticateToken } from "../Controladores/authMiddleware";
 import Alimentos from "../Controladores/AlimentosController";
 import HealthPass from "../Controladores/healthPass";
 import Profile from "../Controladores/Profile";
+import WebCam from "../Controladores/WebCam";
 
 const router = express.Router();
 
@@ -16,6 +17,7 @@ const redefinicaoSenha = new RedefinicaoSenha();
 const emailController = new EmailController();
 const alimentosController = new Alimentos();
 const newProfile = new Profile();
+const photo = new WebCam();
 
 // Definindo a rota para buscar alimentos
 router.post("/buscar-alimento", alimentosController.Find);
@@ -48,5 +50,9 @@ router.get("/auth/google/callback", (req, res) =>
 
 // Rota para obter os dados do perfil usando o userId
 router.get("/profile/:userId", newProfile.getProfile);
+
+router.post("/web", photo.savePhoto);
+
+router.get("/web", photo.getCam);
 
 export default router;
