@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import passport from "passport";
-import pool from "./db";
+import pool from "../database/db";
 import {
   Strategy as GoogleStrategy,
   VerifyCallback,

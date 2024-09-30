@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
-import pool from "./db";
+import pool from "../database/db";
 dotenv.config();
 
 const DB_NAME = process.env.DB_NAME;

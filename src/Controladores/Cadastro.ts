@@ -3,7 +3,7 @@ import { MongoClient } from "mongodb";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import pool from "./db";
+import pool from "../database/db";
 
 dotenv.config();
 

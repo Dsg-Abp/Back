@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
-import pool from "./db"; // Assumindo que o pool de conexões já foi configurado corretamente
+import pool from "../database/db"; // Assumindo que o pool de conexões já foi configurado corretamente
 
 dotenv.config();
 
