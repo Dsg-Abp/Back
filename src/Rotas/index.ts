@@ -6,7 +6,7 @@ import EmailController from "../Controladores/PostResetSenha";
 import { authenticateToken } from "../Controladores/authMiddleware";
 import Alimentos from "../Controladores/AlimentosController";
 import HealthPass from "../Controladores/healthPass";
-import GetHealthPass from "../Controladores/getHealthPass";
+import Profile from "../Controladores/Profile";
 
 import Agua from "../Controladores/UpWater";
 
@@ -21,12 +21,12 @@ const agua = new Agua();
 
 const redefinicaoSenha = new RedefinicaoSenha();
 const emailController = new EmailController();
-const alimentosController = new Alimentos(); //rota adicionada para procurar dados no banco;
+const alimentosController = new Alimentos();
+const newProfile = new Profile();
 
 // Definindo a rota para buscar alimentos
-router.post('/buscar-alimento', alimentosController.Find);
+router.post("/buscar-alimento", alimentosController.Find);
 const healthPass = new HealthPass();
-const getHealthPass = new GetHealthPass();
 
 // Rota de login
 router.post("/login", authController.login);
@@ -37,6 +37,9 @@ router.post("/listagua", agua.FindAgua);
 
 // Rota de cadastro de usuário (registro)
 router.post("/register", cadastro.register);
+
+// Rota para salvar os dados do perfil
+router.post("/profile", newProfile.saveProfile);
 
 // Rota de recuperação de senha
 router.post("/recuperacao-senha", redefinicaoSenha.resetPassword);
@@ -52,16 +55,6 @@ router.get("/auth/google", authController.googleLogin);
 // Rota de callback do Google
 router.get("/auth/google/callback", (req, res) =>
   authController.googleCallback(req, res)
-);
-
-// Rota para obter contagem de passos
-router.get("/user/:userId/step-count", (req, res) =>
-  healthPass.getStepCount(req, res)
-);
-
-//Rota para trazer da coleção instatanea -  somar e exibir por dia.
-router.get("/user/:userId/steps-today", (req, res) =>
-  getHealthPass.getStepCount(req, res)
 );
 
 export default router;
