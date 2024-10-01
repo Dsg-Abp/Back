@@ -7,23 +7,12 @@ dotenv.config();
 
 const DB_NAME = process.env.DB_NAME;
 
-class Profile {
-  async saveProfile(req: Request, res: Response) {
-    const { nome, peso, altura, genero, dataNascimento, userId, imc } =
-      req.body;
+class WebCam {
+  async savePhoto(req: Request, res: Response) {
+    const { userId, image } = req.body;
 
-    if (
-      !nome ||
-      !peso ||
-      !altura ||
-      !genero ||
-      !dataNascimento ||
-      !userId ||
-      !imc
-    ) {
-      return res
-        .status(400)
-        .json({ error: "Todos os campos são obrigatórios" });
+    if (!userId || !image) {
+      return res.status(400).json({ error: "userId e foto são obrigatórios" });
     }
 
     let client: MongoClient | null = null;
@@ -37,12 +26,8 @@ class Profile {
 
       if (existingProfile) {
         const updatedProfile = {
-          imc,
-          nome,
-          peso,
-          altura,
-          genero,
-          dataNascimento,
+          userId,
+          image,
           updatedAt: new Date(),
         };
 
@@ -54,13 +39,8 @@ class Profile {
         });
       } else {
         const newProfile = {
-          imc,
           userId,
-          nome,
-          peso,
-          altura,
-          genero,
-          dataNascimento,
+          image,
           createdAt: new Date(),
         };
 
@@ -80,8 +60,8 @@ class Profile {
       }
     }
   }
-  //
-  async getProfile(req: Request, res: Response) {
+
+  async getCam(req: Request, res: Response) {
     const { userId } = req.params;
 
     if (!userId) {
@@ -113,4 +93,4 @@ class Profile {
   }
 }
 
-export default Profile;
+export default WebCam;

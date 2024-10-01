@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import router from "./Rotas";
-import client from "./Controladores/db";
+import client from "./database/db";
 
 dotenv.config();
 

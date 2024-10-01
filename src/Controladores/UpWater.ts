@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
-import pool from "./db"; // Assumindo que o pool de conexões já foi configurado corretamente
+import pool from "../database/db"; // Assumindo que o pool de conexões já foi configurado corretamente
 
 dotenv.config();
 
@@ -86,6 +86,37 @@ class Agua {
         await client.close(); // Fechar a conexão com o banco de dados
       }
     }
+  }
+  
+  async  findTeste(req: Request, res: Response) {
+    
+    let client: MongoClient | null = null;
+    client = await pool.connect(); // Conectar ao banco de dados
+      const db = client.db(DB_NAME_AGUA);
+      const collection = db.collection("IDagua");
+
+    const findResult = await collection.find({}).toArray();
+    //console.log('Found documents =>', findResult);
+
+    res.json({findResult})
+    
+  }
+
+  async upTest(req: Request, res:Response){
+    
+    let email = req.body
+
+    let client: MongoClient | null = null;
+    client = await pool.connect()
+    const db = client.db(DB_NAME_AGUA)
+    const collection = db.collection("IDagua")
+
+    const insertResult = await collection.insertOne({ email});
+    console.log('Inserted documents =>', insertResult);
+
+    res.json(insertResult)
+    
+
   }
   
 }
