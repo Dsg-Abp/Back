@@ -33,6 +33,7 @@ class AuthController {
         return res.status(401).json({ error: "Credenciais inválidas" });
       }
 
+      //
       const isPasswordValid = bcrypt.compareSync(senha, user.senha);
 
       if (!isPasswordValid) {
