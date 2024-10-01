@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import dotenv from "dotenv";
-import pool from "./db";
+import pool from "../database/db";
 import { MongoClient } from "mongodb";
 dotenv.config();
 
