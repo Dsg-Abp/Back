@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { MongoClient, ObjectId } from "mongodb";
 import axios from "axios";
 import dotenv from "dotenv";
-import pool from "./db";
+import pool from "../database/db";
 import { GoogleFitResponse, User } from "../types/custom";
 
 dotenv.config();

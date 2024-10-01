@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { MongoClient } from "mongodb";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
-import pool from "./db";
+import pool from "../database/db";
 
 const DB_NAME = process.env.DB_NAME;
 dotenv.config();
