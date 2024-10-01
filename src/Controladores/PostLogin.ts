@@ -1,15 +1,10 @@
 import { Request, Response } from "express";
 import { MongoClient } from "mongodb";
 import bcrypt from "bcrypt";
-import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import passport from "passport";
-import pool from "./db";
-import {
-  Strategy as GoogleStrategy,
-  VerifyCallback,
-} from "passport-google-oauth20";
+import pool from "../database/db";
+("passport-google-oauth20");
 
 const DB_NAME = process.env.DB_NAME!;
 const SECRET_KEY = process.env.SECRET_KEY || "default_secret_key";

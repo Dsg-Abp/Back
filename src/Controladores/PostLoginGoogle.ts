@@ -6,7 +6,7 @@ import {
   Strategy as GoogleStrategy,
   VerifyCallback,
 } from "passport-google-oauth20";
-import pool from "./db";
+import pool from "../database/db";
 import { User } from "../types/custom";
 import jwt from "jsonwebtoken"; // Import jwt here
 
