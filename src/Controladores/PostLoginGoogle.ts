@@ -8,7 +8,7 @@ import {
 } from "passport-google-oauth20";
 import pool from "../database/db";
 import { User } from "../types/custom";
-import jwt from "jsonwebtoken"; // Import jwt here
+import jwt from "jsonwebtoken";
 
 dotenv.config();
 
@@ -17,6 +17,7 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL!;
 const FRONTEND_URL = process.env.REACT_APP_FRONTEND_URL!;
+const SECRET_KEY = process.env.SECRET_KEY!;
 
 class GoogleAuthController {
   constructor() {
@@ -33,8 +34,10 @@ class GoogleAuthController {
           profile: any,
           done: VerifyCallback
         ) => {
+          let client: MongoClient | null = null;
+
           try {
-            const client: MongoClient = pool;
+            client = await pool.connect();
             const db = client.db(DB_NAME);
             const collection = db.collection<User>("login");
 
@@ -50,6 +53,7 @@ class GoogleAuthController {
               };
 
               const result = await collection.insertOne(newUser);
+
               user = await collection.findOne({ _id: result.insertedId });
             } else {
               await collection.updateOne(
@@ -60,7 +64,12 @@ class GoogleAuthController {
 
             done(null, user || undefined);
           } catch (error) {
+            console.error("Error during Google authentication:", error);
             done(error);
+          } finally {
+            if (client) {
+              client.close();
+            }
           }
         }
       )
@@ -71,29 +80,29 @@ class GoogleAuthController {
     });
 
     passport.deserializeUser(async (id: string, done) => {
+      let client: MongoClient | null = null;
+
       try {
-        const client: MongoClient = pool;
+        client = await pool.connect();
         const db = client.db(DB_NAME);
         const collection = db.collection<User>("login");
 
         const user = await collection.findOne({ _id: new ObjectId(id) });
         done(null, user || undefined);
       } catch (error) {
+        console.error("Error during user deserialization:", error);
         done(error);
+      } finally {
+        if (client) {
+          client.close();
+        }
       }
     });
   }
 
   googleLogin(req: Request, res: Response) {
     passport.authenticate("google", {
-      scope: [
-        "profile",
-        "email",
-        "https://www.googleapis.com/auth/fitness.activity.read",
-        "https://www.googleapis.com/auth/fitness.activity.write",
-        "https://www.googleapis.com/auth/fitness.body.read",
-        "https://www.googleapis.com/auth/fitness.body.write",
-      ],
+      scope: ["profile", "email"],
     })(req, res);
   }
 
@@ -101,17 +110,24 @@ class GoogleAuthController {
     passport.authenticate(
       "google",
       (err: any, user: User | false | undefined) => {
-        if (err || !user) {
+        if (err) {
+          console.error("Google authentication error:", err);
           return res.redirect("/login");
         }
 
-        const token = jwt.sign(
-          { id: user._id!.toString() },
-          process.env.SECRET_KEY!,
-          {
-            expiresIn: "1h",
-          }
-        );
+        if (!user) {
+          return res.redirect("/login");
+        }
+
+        if (!SECRET_KEY) {
+          return res
+            .status(500)
+            .send("Internal server error: Missing secret key");
+        }
+
+        const token = jwt.sign({ id: user._id!.toString() }, SECRET_KEY, {
+          expiresIn: "1h",
+        });
 
         res.redirect(
           `${FRONTEND_URL}/?token=${token}&userId=${user._id!.toString()}`
