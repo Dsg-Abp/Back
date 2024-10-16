@@ -80,7 +80,7 @@ class Profile {
       }
     }
   }
-
+  //
   async getProfile(req: Request, res: Response) {
     const { userId } = req.params;
 
