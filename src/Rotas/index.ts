@@ -9,11 +9,8 @@ import Alimentos from "../Controladores/AlimentosController";
 import HealthPass from "../Controladores/healthPass";
 import Profile from "../Controladores/Profile";
 import WebCam from "../Controladores/WebCam";
-<<<<<<< HEAD
 import imcProfile from "../Controladores/getProfile";
 
-=======
->>>>>>> bc79b19413d8a660b6c6b8462aeaa2e254a501b7
 import Agua from "../Controladores/UpWater";
 import GoogleAuthController from "../Controladores/PostLoginGoogle";
 
@@ -28,12 +25,7 @@ const emailController = new EmailController();
 const alimentosController = new Alimentos();
 const newProfile = new Profile();
 const photo = new WebCam();
-<<<<<<< HEAD
 router.get("/dataProfile", imcdata.getData);
-=======
-const healthPass = new HealthPass();
-
->>>>>>> bc79b19413d8a660b6c6b8462aeaa2e254a501b7
 // Definindo a rota para buscar alimentos
 router.post("/buscar-alimento", alimentosController.Find);
 
