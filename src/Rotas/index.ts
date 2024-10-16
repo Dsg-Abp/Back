@@ -8,11 +8,12 @@ import Alimentos from "../Controladores/AlimentosController";
 import HealthPass from "../Controladores/healthPass";
 import Profile from "../Controladores/Profile";
 import WebCam from "../Controladores/WebCam";
+import imcProfile from "../Controladores/getProfile";
 
 import Agua from "../Controladores/UpWater";
 
 const router = express.Router();
-
+const imcdata = new imcProfile();
 const authController = new AuthController();
 const cadastro = new Cadastro();
 
@@ -25,7 +26,7 @@ const emailController = new EmailController();
 const alimentosController = new Alimentos();
 const newProfile = new Profile();
 const photo = new WebCam();
-
+router.get("/dataProfile", imcdata.getData);
 // Definindo a rota para buscar alimentos
 router.post("/buscar-alimento", alimentosController.Find);
 const healthPass = new HealthPass();
