@@ -25,7 +25,7 @@ const emailController = new EmailController();
 const alimentosController = new Alimentos();
 const newProfile = new Profile();
 const photo = new WebCam();
-router.get("/dataProfile", imcdata.getData);
+router.get("/dataProfile/:userId", imcdata.getData);
 // Definindo a rota para buscar alimentos
 router.post("/buscar-alimento", alimentosController.Find);
 
