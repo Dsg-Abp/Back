@@ -20,48 +20,43 @@ async function connectToDatabase() {
 }
 
 class UserAlimentos {
-  // Método para inserir dados no banco de dados
   async insertData(req: Request, res: Response): Promise<void> {
-    const { alimento, nutrientes, grams, day, userId } = req.body;
+    const { alimentos, nutrientes, grams, day, userId } = req.body;
 
-    // Verificação básica dos campos
-    if (!alimento || !nutrientes || !grams || !day || !userId) {
-      res.status(400).json({ message: "Todos os campos são obrigatórios" });
-      return;
+    console.log("Dados recebidos:", req.body); 
+
+    if (!alimentos || !nutrientes || !grams || !day || !userId) {
+        res.status(400).json({ message: "Todos os campos são obrigatórios" });
+        return;
     }
 
     try {
-      const db = await connectToDatabase();
-      const collection = db.collection("userData");
+        const db = await connectToDatabase();
+        console.log("Banco de dados conectado:", db.databaseName);
+        const collection = db.collection("userData");
 
-      // Inserindo os dados com a data de inserção
-      const result = await collection.insertOne({
-        alimentos: alimento, // Renomeando para 'alimentos'
-        nutrientes,
-        gramas: grams, // Renomeando para 'gramas'
-        refeicao: day, // Renomeando para 'refeicao'
-        userId, // Incluindo userId
-        dataInsercao: new Date() // Adicionando a data de inserção
-      });
-      
-      // Respondendo com sucesso
-      res.status(201).json({ message: "Dados inseridos com sucesso", insertedId: result.insertedId });
-    } catch (error) {
-      console.error("Erro ao inserir dados:", error);
-      res.status(500).json({ message: "Erro ao inserir os dados" });
+        const result = await collection.insertOne({
+            alimentos, 
+            nutrientes,
+            gramas: grams,
+            refeicao: day,
+            userId,
+            dataInsercao: new Date() 
+        });
+
+        res.status(201).json({ message: "Dados inseridos com sucesso", insertedId: result.insertedId });
+    } catch (error: any) {
+        console.error("Erro ao inserir dados:", error.message); 
+        res.status(500).json({ message: "Erro ao inserir os dados", error: error.message });
     }
-  }
-
-  // Método para buscar dados do banco de dados
+}
   async getData(req: Request, res: Response): Promise<void> {
     try {
       const db = await connectToDatabase();
       const collection = db.collection("userData");
 
-      // Buscando os dados
       const data = await collection.find({}).toArray();
       
-      // Respondendo com os dados encontrados
       res.status(200).json({ message: "Dados obtidos com sucesso", data });
     } catch (error) {
       console.error("Erro ao buscar dados:", error);
