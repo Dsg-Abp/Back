@@ -32,7 +32,7 @@ router.get("/dataProfile/:userId", imcdata.getData);
 router.post("/buscar-alimento", alimentosController.Find);
 
 router.post("/alimentosData", userAlimentos.insertData);
-router.get("/alimentosData", userAlimentos.getData);
+router.get("/alimentosData/:userId", userAlimentos.getData);
 
 // Rota de login
 router.post("/login", authController.login);

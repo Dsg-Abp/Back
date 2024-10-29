@@ -50,19 +50,33 @@ class UserAlimentos {
         res.status(500).json({ message: "Erro ao inserir os dados", error: error.message });
     }
 }
-  async getData(req: Request, res: Response): Promise<void> {
-    try {
+
+async getData(req: Request, res: Response){
+  const { userId } = req.params;
+
+  // Verifica se o userId foi fornecido
+  if (!userId) {
+      return res.status(400).json({ error: "O campo userId é obrigatório" });
+  }
+
+  try {
       const db = await connectToDatabase();
       const collection = db.collection("userData");
 
-      const data = await collection.find({}).toArray();
-      
-      res.status(200).json({ message: "Dados obtidos com sucesso", data });
-    } catch (error) {
+      // Busca os dados filtrando pelo userId
+      const data = await collection.find({ userId }).toArray();
+
+      if (data.length > 0) {
+          res.status(200).json({ message: "Dados obtidos com sucesso", data });
+      } else {
+          res.status(404).json({ error: "Nenhum dado encontrado para este userId" });
+      }
+  } catch (error) {
       console.error("Erro ao buscar dados:", error);
       res.status(500).json({ message: "Erro ao buscar os dados" });
-    }
   }
+}
+
 }
 
 export default UserAlimentos;
