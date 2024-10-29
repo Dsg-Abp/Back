@@ -34,13 +34,14 @@ class UserAlimentos {
       const db = await connectToDatabase();
       const collection = db.collection("userData");
 
-      // Inserindo os dados
+      // Inserindo os dados com a data de inserção
       const result = await collection.insertOne({
         alimentos: alimento, // Renomeando para 'alimentos'
         nutrientes,
         gramas: grams, // Renomeando para 'gramas'
         refeicao: day, // Renomeando para 'refeicao'
         userId, // Incluindo userId
+        dataInsercao: new Date() // Adicionando a data de inserção
       });
       
       // Respondendo com sucesso
