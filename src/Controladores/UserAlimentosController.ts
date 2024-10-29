@@ -4,7 +4,7 @@ import { MongoClient, Db } from "mongodb";
 dotenv.config();
 
 const DB_NAME = process.env.DB_NAME_INSERT;
-const MONGO_URI = process.env.MONGO_URI;
+const MONGO_URI = process.env.DATABASE_URL;
 
 let client: MongoClient;
 let db: Db;
