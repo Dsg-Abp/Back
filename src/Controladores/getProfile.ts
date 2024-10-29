@@ -17,9 +17,9 @@ class imcProfile {
             client = await pool.connect();
             const db = client.db("Users");
             const collection = db.collection("profile");
-            const result = await collection.findOne({ userId }, { projection: { image: 0, _id: 0 } });
-            if (result) {
-                res.status(200).json({ message: "Dados recebidos com sucesso!", data: result });
+            const profile = await collection.findOne({ userId }, { projection: { image: 0, _id: 0 } });
+            if (profile) {
+                res.status(200).json({ profile });
             } else {
                 res.status(404).json({error: "Perfil não encontrado"});
             }

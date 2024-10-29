@@ -1,18 +1,18 @@
 import { Request, Response } from "express";
 import dotenv from "dotenv";
-import pool from "../database/db";
 import { MongoClient } from "mongodb";
 dotenv.config();
 
 const DB_NAME = process.env.DB_NAME_INSERT;
+const MONGO_URI = process.env.MONGO_URI;
 
 class UserAlimentos {
   // Método para inserir dados no banco de dados
   async insertData(req: Request, res: Response): Promise<void> {
-    const { alimento, nutrientes, day } = req.body;
+    const { alimentos, nutrientes, gramas, refeicao } = req.body;
 
     // Verificação básica dos campos
-    if (!alimento || !nutrientes || !day) {
+    if (!alimentos || !nutrientes || !gramas || !refeicao) {
       res.status(400).json({ message: "Todos os campos são obrigatórios" });
       return;
     }
@@ -21,12 +21,13 @@ class UserAlimentos {
 
     try {
       // Conectando ao MongoDB
-      client = await pool.connect();
+      client = new MongoClient(MONGO_URI!);
+      await client.connect();
       const db = client.db(DB_NAME);
       const collection = db.collection("userData");
 
       // Inserindo os dados
-      const result = await collection.insertOne({ alimento, nutrientes, day });
+      const result = await collection.insertOne({ alimentos, nutrientes, gramas, refeicao });
       
       // Respondendo com sucesso
       res.status(201).json({ message: "Dados inseridos com sucesso", data: result });
@@ -36,7 +37,7 @@ class UserAlimentos {
     } finally {
       // Certifique-se de fechar a conexão com o banco de dados
       if (client) {
-        client.close();
+        await client.close();
       }
     }
   }
@@ -47,7 +48,8 @@ class UserAlimentos {
 
     try {
       // Conectando ao MongoDB
-      client = await pool.connect();
+      client = new MongoClient(MONGO_URI!);
+      await client.connect();
       const db = client.db(DB_NAME);
       const collection = db.collection("userData");
 
@@ -62,7 +64,7 @@ class UserAlimentos {
     } finally {
       // Fechando a conexão com o banco de dados
       if (client) {
-        client.close();
+        await client.close();
       }
     }
   }

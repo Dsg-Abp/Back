@@ -10,6 +10,7 @@ import HealthPass from "../Controladores/healthPass";
 import Profile from "../Controladores/Profile";
 import WebCam from "../Controladores/WebCam";
 import imcProfile from "../Controladores/getProfile";
+import UserAlimentos from "../Controladores/UserAlimentosController";
 
 import Agua from "../Controladores/UpWater";
 import GoogleAuthController from "../Controladores/PostLoginGoogle";
@@ -25,9 +26,13 @@ const emailController = new EmailController();
 const alimentosController = new Alimentos();
 const newProfile = new Profile();
 const photo = new WebCam();
+const userAlimentos = new UserAlimentos();
 router.get("/dataProfile/:userId", imcdata.getData);
 // Definindo a rota para buscar alimentos
 router.post("/buscar-alimento", alimentosController.Find);
+
+router.post("/alimentosData", userAlimentos.insertData);
+router.get("/alimentosData", userAlimentos.getData);
 
 // Rota de login
 router.post("/login", authController.login);
