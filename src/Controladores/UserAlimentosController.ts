@@ -22,10 +22,10 @@ async function connectToDatabase() {
 class UserAlimentos {
   // Método para inserir dados no banco de dados
   async insertData(req: Request, res: Response): Promise<void> {
-    const { alimentos, nutrientes, gramas, refeicao } = req.body;
+    const { alimento, nutrientes, grams, day, userId } = req.body;
 
     // Verificação básica dos campos
-    if (!alimentos || !nutrientes || !gramas || !refeicao) {
+    if (!alimento || !nutrientes || !grams || !day || !userId) {
       res.status(400).json({ message: "Todos os campos são obrigatórios" });
       return;
     }
@@ -35,7 +35,13 @@ class UserAlimentos {
       const collection = db.collection("userData");
 
       // Inserindo os dados
-      const result = await collection.insertOne({ alimentos, nutrientes, gramas, refeicao });
+      const result = await collection.insertOne({
+        alimentos: alimento, // Renomeando para 'alimentos'
+        nutrientes,
+        gramas: grams, // Renomeando para 'gramas'
+        refeicao: day, // Renomeando para 'refeicao'
+        userId, // Incluindo userId
+      });
       
       // Respondendo com sucesso
       res.status(201).json({ message: "Dados inseridos com sucesso", insertedId: result.insertedId });
