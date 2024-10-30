@@ -49,8 +49,8 @@ router.get(
 // Rota de inserção de água
 router.post("/agua", agua.registera);
 router.post("/listagua", agua.FindAgua);
-router.get("/teste", agua.findTeste);
-router.post("/insert", agua.upTest);
+router.get("/findagua", agua.find);
+router.post("/insert", agua.upagua);
 
 // Rota de cadastro de usuário (registro)
 router.post("/register", cadastro.register);

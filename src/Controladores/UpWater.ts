@@ -88,7 +88,7 @@ class Agua {
     }
   }
   
-  async  findTeste(req: Request, res: Response) {
+  async  find(req: Request, res: Response) {
     
     let client: MongoClient | null = null;
     client = await pool.connect(); // Conectar ao banco de dados
@@ -102,7 +102,7 @@ class Agua {
     
   }
 
-  async upTest(req: Request, res:Response){
+  async upagua(req: Request, res:Response){
     
     let email = req.body
 
