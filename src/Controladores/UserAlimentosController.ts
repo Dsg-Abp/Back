@@ -51,7 +51,7 @@ class UserAlimentos {
         }
     }
 
-    async getData(req: Request, res: Response) {
+    async getData(req: Request, res: Response): Promise<any> {
         const { userId } = req.params;
 
         // Verifica se o userId foi fornecido
@@ -63,13 +63,18 @@ class UserAlimentos {
             const db = await connectToDatabase();
             const collection = db.collection("userData");
 
-            // Agrega os dados para calcular a soma das calorias diárias
+            // Verifica se o campo "nutrientes.calorias" está armazenado como um número e a data é um campo Date no banco de dados
             const pipeline = [
-                { $match: { userId } },
+                { $match: { userId } }, // Filtra pelo userId fornecido
                 {
-                    $group: {
-                        _id: { $dateToString: { format: "%Y-%m-%d", date: "$dataInsercao" } }, // Agrupa por dia
-                        totalCalorias: { $sum: { $toDouble: "$nutrientes.calorias" } } // Soma das calorias
+                    $addFields: { // Garante que o campo "nutrientes.calorias" é tratado como número
+                        "nutrientes.calorias": { $toDouble: "$nutrientes.calorias" }
+                    }
+                },
+                {
+                    $group: { // Agrupa os dados por dia
+                        _id: { $dateToString: { format: "%Y-%m-%d", date: "$dataInsercao" } },
+                        totalCalorias: { $sum: "$nutrientes.calorias" }
                     }
                 },
                 { $sort: { "_id": 1 } } // Ordena por data
@@ -87,8 +92,6 @@ class UserAlimentos {
             res.status(500).json({ message: "Erro ao buscar os dados", error });
         }
     }
-
-
 }
 
 export default UserAlimentos;
